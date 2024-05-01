@@ -15,38 +15,101 @@ const Anime = mongoose.model("Anime", {
   category: [String],
 });
 
-//Listar todos os animes
+// Listar todos os animes
 app.get("/listar_animes", async (req, res) => {
-  const animes = await Anime.find();
-  return res.json({
-    animes,
-    mensagem: "Sucesso",
-  });
+  try {
+    const animes = await Anime.find();
+    return res.json({
+      animes,
+      mensagem: "Sucesso",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      mensagem: "Erro ao listar animes",
+      error: error.message,
+    });
+  }
 });
 
 // Rota para cadastrar um anime
 app.post("/cadastro_anime", async (req, res) => {
-  const anime = new Anime({
-    title: req.body.title,
-    description: req.body.description,
-    image_url: req.body.image_url,
-    category: req.body.category,
-  });
+  try {
+    const anime = new Anime({
+      title: req.body.title,
+      description: req.body.description,
+      image_url: req.body.image_url,
+      category: req.body.category,
+    });
 
-  await anime.save();
+    await anime.save();
 
-  res.json({
-    anime,
-    mensagem: "Cadastrado com sucesso",
-  });
+    return res.json({
+      anime,
+      mensagem: "Cadastrado com sucesso",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      mensagem: "Erro ao cadastrar anime",
+      error: error.message,
+    });
+  }
 });
 
+// Rota para atualizar um anime
+app.put("/atualizar_anime/:id", async (req, res) => {
+  try {
+    const anime = await Anime.findByIdAndUpdate(
+      req.params.id,
+      {
+        title: req.body.title,
+        description: req.body.description,
+        image_url: req.body.image_url,
+        category: req.body.category,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!anime) {
+      return res.status(404).json({
+        mensagem: "Anime não encontrado",
+      });
+    }
+
+    return res.json({
+      anime,
+      mensagem: "Anime atualizado com sucesso",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      mensagem: "Erro ao atualizar anime",
+      error: error.message,
+    });
+  }
+});
+
+// Rota para deletar um anime
 app.delete("/deletar_anime/:id", async (req, res) => {
-  const anime = await Anime.findOneAndDelete({ _id: req.params.id });
-  return res.json({
-    anime,
-    mensagem: "Anime Deletado com sucesso",
-  });
+  try {
+    const anime = await Anime.findOneAndDelete({ _id: req.params.id });
+
+    if (!anime) {
+      return res.status(404).json({
+        mensagem: "Anime não encontrado",
+      });
+    }
+
+    return res.json({
+      anime,
+      mensagem: "Anime deletado com sucesso",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      mensagem: "Erro ao deletar anime",
+      error: error.message,
+    });
+  }
 });
 
 mongoose
@@ -58,7 +121,6 @@ mongoose
     console.log("Connected to database");
     app.listen(port, () => {
       console.log("App Running 🫰🚀🚀🚀...");
-
     });
   })
   .catch((error) => {
