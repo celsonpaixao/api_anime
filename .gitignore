@@ -1,0 +1,3 @@
+# Arquivos e pastas geradas pelo Yarn
+node_modules/
+.yarn/
