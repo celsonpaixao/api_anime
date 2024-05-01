@@ -1,10 +1,11 @@
 import express from "express";
 import mongoose from "mongoose";
-import { Conection } from "./src/conection";
+import DbString from "./src/connectionString.js";
 
 const app = express();
 app.use(express.json());
 const port = 3000;
+const connectionString = DbString();
 
 // Definir o modelo Anime
 const Anime = mongoose.model("Anime", {
@@ -41,15 +42,25 @@ app.post("/cadastro_anime", async (req, res) => {
 });
 
 app.delete("/deletar_anime/:id", async (req, res) => {
-  const anime = await Anime.findOneAndDelete(req.params.id);
+  const anime = await Anime.findOneAndDelete({ _id: req.params.id });
   return res.json({
     anime,
     mensagem: "Anime Deletado com sucesso",
   });
 });
 
-app.listen(port, () => {
-  // Conectar ao banco de dados
-  Conection();
-  console.log("App Running 🫰🚀🚀🚀...");
-});
+mongoose
+  .connect(connectionString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Connected to database");
+    app.listen(port, () => {
+      console.log("App Running 🫰🚀🚀🚀...");
+
+    });
+  })
+  .catch((error) => {
+    console.error("Error connecting to database", error);
+  });
