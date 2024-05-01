@@ -1,5 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
+import { Conection } from "./src/conection";
 
 const app = express();
 app.use(express.json());
@@ -49,8 +50,6 @@ app.delete("/deletar_anime/:id", async (req, res) => {
 
 app.listen(port, () => {
   // Conectar ao banco de dados
-  mongoose.connect(
-    "mongodb+srv://celson2020fernando:BQsZ2VurhqHuYB20@animedb.qhavod4.mongodb.net/?retryWrites=true&w=majority&appName=animedb"
-  );
+  Conection();
   console.log("App Running 🫰🚀🚀🚀...");
 });
